@@ -1,0 +1,24 @@
+# OS files
+.DS_Store
+Thumbs.db
+
+# Editor / IDE
+.vscode/
+.idea/
+
+# Dependencies and build output (none used today, kept for the future)
+node_modules/
+dist/
+
+# Packaged extension archives
+*.zip
+*.crx
+*.pem
+
+# Local configuration and secrets
+.env
+.env.*
+*.local
+
+# Logs
+*.log
