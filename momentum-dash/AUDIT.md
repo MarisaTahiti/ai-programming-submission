@@ -1,51 +1,52 @@
 # AUDIT — Focus Tab (Momentum Dash replica)
 
-Audit run with Claude (Anthropic's AI assistant), using the audit prompt from the submission guidelines. Nothing sensitive is recorded here.
+## How the audit was run
+
+I ran the audit prompt from the submission guidelines with Claude (Anthropic's AI assistant), which inspected the project files as a read-only check. I then read the findings myself and decided what needed action. This file contains no secrets or sensitive details.
 
 ## What was checked
 
-- All project files: `manifest.json`, `newtab.html`, `script.js`, `style.css`, `icons/`, `README.md`.
-- Search for secrets, credentials, tokens, e-mail addresses, phone numbers and personal names in the code and docs.
-- Files that should not be published (local config, caches, dependency folders, generated files, hidden files).
-- `.gitignore` rules, setup instructions, configuration examples, and README coverage of the required sections.
-- The icons were opened and contain nothing personal (a plain dark ring).
+- All project files: manifest.json, newtab.html, script.js, style.css, icons/, screenshots/, README.md.
+- Secrets, credentials, e-mail addresses, phone numbers and personal names in code and docs.
+- Files that should not be published (local configuration, caches, dependency folders, generated files, hidden files).
+- .gitignore rules, setup instructions, configuration examples, and README coverage of the required sections.
 
-## Round 1 — issues found
+## Round 1 — first check (before the README was finished)
 
 | # | Type | Finding | Location |
 |---|---|---|---|
-| 1 | Confirmed | No `.gitignore` | project root |
-| 2 | Confirmed | README did not cover all required sections (no Data persistence table, Learning, Limitations and assistance) and had no screenshot | `README.md` |
-| 3 | Confirmed | README setup said to select a folder called `momentum-extension-v2`, which does not match this project's folder name | `README.md` (Install) |
-| 4 | Possible concern | `host_permissions` for Wikimedia may be more than needed, since the request already uses `origin=*` | `manifest.json` |
-| 5 | Possible concern | To-do text is stored unencrypted in `chrome.storage.local` (local to the browser, never sent anywhere) | `script.js` |
-| 6 | Possible concern | Photo author names come from an external API; they are cleaned of HTML tags and shown with `textContent`, not `innerHTML` | `script.js` |
+| 1 | Confirmed | No .gitignore | project root |
+| 2 | Confirmed | README did not cover all required sections and had no screenshot | README.md |
+| 3 | Confirmed | README setup named a folder that does not match this project | README.md |
 
-No secrets, credentials, API keys or personal data were found: the extension uses a public API that needs no key.
+Fixes made: added a .gitignore, rewrote the README with the 7 required sections, and corrected the setup steps. No code was changed.
 
-## Fixes made
+## Round 2 — audit prompt run on the final folder
 
-- #1: added a `.gitignore` (OS files, editor files, dependency/build folders, `*.zip`/`*.crx`/`*.pem`, `.env*`, logs).
-- #2: rewrote the README with every required section, a storage table and a place for the screenshot (`screenshots/newtab.png`).
-- #3: README setup now matches this folder (`momentum-dash`).
-- No code was changed.
+Result: no secrets, credentials or personal data were found. The README has all required sections and the screenshot is linked. No cache, dependency or generated files.
 
-## Decisions on the possible concerns
+| # | Type | Finding | My decision |
+|---|---|---|---|
+| 1 | Confirmed | This AUDIT.md was out of date | Rewritten (this version) |
+| 2 | Possible concern | The screenshot contains a photo from Wikimedia Commons; I did not check its licence | Kept. The author is credited in the image and the README says the photos belong to their authors |
+| 3 | Possible concern | host_permissions for Wikimedia in manifest.json may be wider than needed | Kept. Limited to two Wikimedia domains; I did not change it without testing in Chrome |
+| 4 | Possible concern | To-do tasks are stored unencrypted in chrome.storage.local | Accepted. Data stays on the user's computer and the README explains it |
+| 5 | Recommended improvement | No LICENSE file | Not added. It is not required for this assignment and is not a security risk |
 
-- #4: kept as is. Permissions are limited to two Wikimedia domains and `storage`. I did not remove them without testing the extension in Chrome first.
-- #5: accepted. Data stays on the user's computer and the README says so.
-- #6: no action needed. Text is inserted with `textContent`, so it cannot run as HTML.
+I also cropped the browser bar out of the screenshot so that my profile picture is not published.
 
-## Round 2 — repeat check on the final folder
+## Round 3 — check after uploading to GitHub
 
-- Secret/personal-data search repeated: no matches in the code files (the only hit was the word "secrets" in a `.gitignore` comment).
-- Hidden files: only `.gitignore` and `screenshots/.gitkeep`.
-- The four code files (`manifest.json`, `newtab.html`, `script.js`, `style.css`) are byte-identical to the original ones.
-- No remaining confirmed issue, except the screenshot still to be added.
+I looked at the file list of the momentum-dash folder on GitHub and found two problems:
+
+1. I first uploaded the .zip file by mistake instead of the folder. I deleted it in a separate commit and uploaded the unzipped folder. The zip contained the same files as the repository (no secrets), but it still exists in the Git history. I accepted this because nothing sensitive was in it.
+2. The .gitignore file was missing from the upload (files starting with a dot were not sent). I created it directly on GitHub with the same content.
+
+After these fixes, the folder on GitHub contains all expected files, and the README displays the screenshot.
 
 ## Remaining limitations / not verified
 
-- **Git**: the folder was audited from a zip, so there was no `.git` folder. Git status, tracked files and commit history were not checked. After the first commit, run `git ls-files` to confirm that only intended files are tracked.
-- The extension was not executed during the audit (as the audit prompt requires), so its behaviour was only reviewed by reading the code.
-- `screenshots/newtab.png` must be added by the author.
+- I did not run Git commands to inspect the full commit history or the list of tracked files; I checked the folder visually on GitHub.
+- The extension code was not executed during the audit, only read.
+- I still have to check that the whole repository opens when I am logged out of GitHub (to be done once all three projects are uploaded).
 - Finding no issues does not prove the project is safe.
